@@ -3,24 +3,27 @@ from scipy import misc
 from math import sin, cos
 import png
 # (height, width)
-a=np.zeros((400,300), dtype=np.uint16)
+a=np.zeros((400,600), dtype=np.uint16)
 walls=np.zeros(a.shape, dtype=np.uint16)
 walls[0:2,0:a.shape[1]]=1
 walls[a.shape[0]-2:a.shape[0],0:a.shape[1]]=1;
 walls[0:a.shape[0],0:2]=2;
 walls[0:a.shape[0],a.shape[1]-2:a.shape[1]]=2;
 
-walls[148:151,0:a.shape[1]]=1
-walls[148:151,30:40]=0
+walls[140:151,0:a.shape[1]]=1
+walls[140:151,30:80]=0
 
-walls[318:321,0:a.shape[1]]=1
-walls[318:321,100:150]=0
+walls[0:a.shape[0],300:305]=1
+walls[50:100,300:305]=0
+
+walls[315:321,0:a.shape[1]]=1
+walls[315:321,100:150]=0
 
 misc.imsave("filename.tif", walls)
 
-for phi_start in np.arange(0,2*(3.1415925),1): 
+for phi_start in np.arange(0,2*(3.1415925),0.005): 
 	print phi_start
-	start_powers = [50000000]
+	start_powers = [500000000]
 	phis = [phi_start]
 	startX = [25]
 	startY = [25] 
@@ -32,6 +35,8 @@ for phi_start in np.arange(0,2*(3.1415925),1):
 		distance = distances.pop(0)
 		phi=phis.pop(0)
 		r = 0
+		
+		data = (start,start_power,distance,phi,r)
 		power=start_power
 		last_changed = 0
 		b=np.zeros(a.shape, dtype=np.uint16)
@@ -39,10 +44,10 @@ for phi_start in np.arange(0,2*(3.1415925),1):
 		inWall = walls[start[0],start[1]]>0
 		inWall2 = walls[start[0],start[1]]>0
 
-		while (power>0.03):
-			r = r + .1
+		while (power>1):
+			r = r + .3
 			iterations +=1
-			distance = distance + .1
+			distance = distance + .3
 			x = r * sin(phi)
 			y = r * cos(phi)
 			x = round(x)
