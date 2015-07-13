@@ -4,7 +4,7 @@ from math import sin, cos
 import png
 
 
-def makeRay((start,start_power,distance,phi,walls)):
+def makeRay(start,start_power,distance,phi,walls):
 	power=start_power
 	last_changed = 0
 	b=np.zeros(walls.shape, dtype=np.uint16)
@@ -12,14 +12,13 @@ def makeRay((start,start_power,distance,phi,walls)):
 	inWall = walls[start[0],start[1]]>0
 	inWall2 = walls[start[0],start[1]]>0
 	r = 0
+	start_powers = []
+	distances = []
+	phis = []
+	startX = []
+	startY = []
 
 	while (power>1):
-		start_powers = []
-		distances = []
-		phis = []
-		startX = []
-		startY = []
-		
 		r = r + .3
 		iterations +=1
 		distance = distance + .3
@@ -31,7 +30,9 @@ def makeRay((start,start_power,distance,phi,walls)):
 		newX = start[0]+x
 		newY = start[1]+y
 
-		try:
+		if newX > b.shape[0]-1 or newY > b.shape[1]-1 or newX < 0 or newY < 0:
+			power = 0
+		else:
 			wallValue = walls[newX,newY]
 			if wallValue>0 and not inWall and not inWall2:
 				inWall = True
@@ -54,19 +55,13 @@ def makeRay((start,start_power,distance,phi,walls)):
 					inWall = False
 				elif inWall2:
 					inWall2 = False
-		except:
-			# outside now
-			power = 0
-			
-		if newX > b.shape[0] or newY > b.shape[1] or newX < 0 or newY < 0:
-			power = 0
 
 		try:
 			if b[newX,newY]==0 and not inWall:
 				b[newX,newY] += power
 		except:
 			pass
-			
+	
 	return (b,start_powers,distances,phis,startX,startY)
 
 def run():
@@ -90,9 +85,8 @@ def run():
 	misc.imsave("filename.tif", walls)
 	num = 0
 
-	for phi_start in np.arange(0,2*(3.1415925),0.001): 
-		print phi_start
-		start_powers = [500000000]
+	for phi_start in np.arange(0,2*(3.1415925),0.1): 
+		start_powers = [50000000]
 		phis = [phi_start]
 		startX = [25]
 		startY = [25] 
@@ -104,7 +98,7 @@ def run():
 			distance = distances.pop(0)
 			phi=phis.pop(0)
 			
-			(b,start_powers2,distances2,phis2,startX2,startY2) = makeRay((start,start_power,distance,phi,walls))
+			(b,start_powers2,distances2,phis2,startX2,startY2) = makeRay(start,start_power,distance,phi,walls)
 			start_powers += start_powers2
 			distances += distances2
 			phis += phis2
@@ -115,7 +109,9 @@ def run():
 
 			num +=1
 			
-			if num % 100 == 0:	
+			if num % 100 == 0:
+				print phi_start
+			if num % 1000 == 0:	
 				print "saved"
 				picture = a;
 				picture[np.where(picture==0)]=1
@@ -131,10 +127,9 @@ def run():
 	picture = a;
 	picture[np.where(picture==0)]=1
 	picture = np.log10(picture)
-	print picture
 	picture[np.where(picture==0)]=np.min(picture)
-	picture = np.add(picture,walls*np.max(picture))
-	print picture
+	picture = picture/np.max(picture)*60000
+	picture = np.add(picture,walls*2500)
 	with open('room.png', 'wb') as f: 
 		writer = png.Writer(width=picture.shape[1], height=picture.shape[0], bitdepth=16, greyscale=True)
 		writer.write(f, picture)
