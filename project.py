@@ -141,19 +141,20 @@ def run2(offset,cores,rays):
 	# (height, width)
 	a=np.zeros((400,600), dtype=np.uint16)
 	walls=np.zeros(a.shape, dtype=np.uint16)
-	walls[0:2,0:a.shape[1]]=1
-	walls[a.shape[0]-2:a.shape[0],0:a.shape[1]]=1;
-	walls[0:a.shape[0],0:2]=2;
-	walls[0:a.shape[0],a.shape[1]-2:a.shape[1]]=2;
+	#walls[0:2,0:a.shape[1]]=1
+	#walls[a.shape[0]-2:a.shape[0],0:a.shape[1]]=1;
+	#walls[0:a.shape[0],0:2]=2;
+	#walls[0:a.shape[0],a.shape[1]-2:a.shape[1]]=2;
 
-	walls[140:151,0:a.shape[1]]=1
-	walls[140:151,30:80]=0
+	walls[100:105,100:500] = 1 # horizontal
+	walls[300:305,100:500] = 1
+	walls[100:300,95:105] = 2 # vertical
+	walls[100:300,490:500] = 2
+	
 
-	walls[0:a.shape[0],300:305]=1
-	walls[50:100,300:305]=0
+	walls[100:300,250:260] = 2
+	walls[200:210,250:500] = 1
 
-	walls[315:321,0:a.shape[1]]=1
-	walls[315:321,100:150]=0
 
 	misc.imsave("filename.tif", walls)
 	num = 0
@@ -220,7 +221,11 @@ def load_and_save(cores):
 		writer.write(f, picture)	
 		
 		
-#print sys.argv[1]
-#print sys.argv[2]
-#run2(float(sys.argv[1]),float(sys.argv[2]),float(sys.argv[3]))
-load_and_save(4)
+print "python project.py offset cores rays\n\npython project.py cores"
+print len(sys.argv)
+if len(sys.argv) == 4:
+	run2(float(sys.argv[1]),float(sys.argv[2]),float(sys.argv[3]))
+elif len(sys.argv) == 2:
+	load_and_save(int(sys.argv[1]))
+
+
